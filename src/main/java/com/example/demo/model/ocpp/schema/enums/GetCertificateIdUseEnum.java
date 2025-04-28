@@ -1,0 +1,10 @@
+package com.example.demo.model.ocpp.schema.enums;
+
+public enum GetCertificateIdUseEnum {
+    V2GROOTCERTIFICATE,
+    MOROOTCERTIFICATE,
+    CSMSROOTCERTIFICATE,
+    V2GCERTIFICATECHAIN,
+    MANUFACTURERROOTCERTIFICATE,
+    OEMROOTCERTIFICATE,
+}

@@ -1,0 +1,25 @@
+package com.example.demo.model.ocpp.schema.reservation_status_update_response;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.util.*;
+import com.example.demo.model.ocpp.schema.enums.*;
+
+@Data
+@NoArgsConstructor
+@Entity
+@Table(name = "reservation_status_update_response")
+public class ReservationStatusUpdateResponse {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long schemaId;
+
+
+    @Column(name = "custom_data")
+    private CustomData customData;
+
+}

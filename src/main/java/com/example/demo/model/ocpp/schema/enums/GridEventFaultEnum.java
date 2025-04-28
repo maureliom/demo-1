@@ -1,0 +1,15 @@
+package com.example.demo.model.ocpp.schema.enums;
+
+public enum GridEventFaultEnum {
+    CURRENTIMBALANCE,
+    LOCALEMERGENCY,
+    LOWINPUTPOWER,
+    OVERCURRENT,
+    OVERFREQUENCY,
+    OVERVOLTAGE,
+    PHASEROTATION,
+    REMOTEEMERGENCY,
+    UNDERFREQUENCY,
+    UNDERVOLTAGE,
+    VOLTAGEIMBALANCE,
+}

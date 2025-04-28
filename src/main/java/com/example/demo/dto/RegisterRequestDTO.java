@@ -1,7 +1,8 @@
 package com.example.demo.dto;
 
+import com.example.demo.model.task.RoleName;
+
 import lombok.Data;
-import com.example.demo.model.RoleName;
 
 @Data
 public class RegisterRequestDTO {

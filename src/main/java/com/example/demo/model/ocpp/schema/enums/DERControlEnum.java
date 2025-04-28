@@ -1,0 +1,26 @@
+package com.example.demo.model.ocpp.schema.enums;
+
+public enum DERControlEnum {
+    ENTERSERVICE,
+    FREQDROOP,
+    FREQWATT,
+    FIXEDPFABSORB,
+    FIXEDPFINJECT,
+    FIXEDVAR,
+    GRADIENTS,
+    HFMUSTTRIP,
+    HFMAYTRIP,
+    HVMUSTTRIP,
+    HVMOMCESS,
+    HVMAYTRIP,
+    LIMITMAXDISCHARGE,
+    LFMUSTTRIP,
+    LVMUSTTRIP,
+    LVMOMCESS,
+    LVMAYTRIP,
+    POWERMONITORINGMUSTTRIP,
+    VOLTVAR,
+    VOLTWATT,
+    WATTPF,
+    WATTVAR,
+}
