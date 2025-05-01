@@ -103,7 +103,11 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
-
+		<dependency>
+		    <groupId>org.freemarker</groupId>
+		    <artifactId>freemarker</artifactId>
+		    <version>2.3.31</version>
+		</dependency>
         <!-- OpenCSV (CSV parsing) -->
         <dependency>
             <groupId>com.opencsv</groupId>
