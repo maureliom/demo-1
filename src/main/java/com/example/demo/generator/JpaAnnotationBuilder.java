@@ -7,16 +7,16 @@ public class JpaAnnotationBuilder {
 
         String columnName = toSnakeCase(fieldName);
 
-        if (isRelation) {
+        if (isRelation && !isEnum) {
             switch (relationType) {
                 case "OneToOne" -> sb.append("@OneToOne\n")
-                                      .append("@JoinColumn(name = \"")
+                                     .append("	@JoinColumn(name = \"")
+                                     .append(columnName)
+                                     .append("\")");
+                case "OneToMany" -> sb.append("@OneToMany\n")
+                                      .append("	@JoinColumn(name = \"")
                                       .append(columnName)
                                       .append("\")");
-                case "OneToMany" -> sb.append("@OneToMany\n")
-                                       .append("@JoinColumn(name = \"")
-                                       .append(columnName)
-                                       .append("\")");
             }
         } else {
             sb.append("@Column(name = \"")
@@ -27,7 +27,7 @@ public class JpaAnnotationBuilder {
         }
 
         if (isEnum) {
-            sb.append("\n@Enumerated(EnumType.STRING)");
+            sb.append("\n	@Enumerated(EnumType.STRING)");
         }
 
         return sb.toString();

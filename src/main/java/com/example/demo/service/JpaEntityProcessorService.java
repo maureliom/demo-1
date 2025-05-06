@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.config.PojoGeneratorProperties;
 import com.example.demo.generator.JpaEntityGenerator;
 import com.example.demo.generator.JpaRepositoryGenerator;
+import com.example.demo.generator.SchemaAnalyzer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.template.Configuration;
@@ -11,7 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -23,12 +27,18 @@ public class JpaEntityProcessorService {
 
     public void run() {
         File schemaDir = new File(properties.getSchemaDirectory());
-
-        if (!schemaDir.exists() || !schemaDir.isDirectory()) {
-            throw new IllegalArgumentException("Invalid schema directory: " + schemaDir.getAbsolutePath());
+//        List<Map<String, List<Integer>>> occurrences = new SchemaAnalyzer().analyzeDefinitionOccurrences(schemaDir.toPath());
+        Map<String, Integer> schemaMap = new SchemaAnalyzer().findMultiUsedDefinitions(schemaDir.toPath());
+        schemaMap.forEach((k, v) -> System.out.println(k + " -> " + v + " occurrences")); 
+        
+    	if (!schemaDir.exists() || !schemaDir.isDirectory()) {
+        throw new IllegalArgumentException("Invalid schema directory: " + schemaDir.getAbsolutePath());
+        
         }
 
         File[] schemaFiles = schemaDir.listFiles((dir, name) -> name.endsWith(".json"));
+        
+
         if (schemaFiles == null || schemaFiles.length == 0) {
             throw new IllegalStateException("No schema files found in directory: " + schemaDir.getAbsolutePath());
         }
@@ -37,14 +47,14 @@ public class JpaEntityProcessorService {
 
         for (File schemaFile : schemaFiles) {
             try {
-                generateJpaEntityAndRepository(schemaFile);
+                generateJpaEntityAndRepository(schemaFile, schemaMap);
             } catch (Exception e) {
                 log.error("❌ Error generating JPA entity for: {}", schemaFile.getName(), e);
             }
         }
     }
 
-    private void generateJpaEntityAndRepository(File schemaFile) throws Exception {
+    private void generateJpaEntityAndRepository(File schemaFile, Map<String, Integer> occurrences) throws Exception {
         String className = deriveClassName(schemaFile);
         String subPackage = deriveSubPackage(schemaFile);
 
@@ -57,7 +67,7 @@ public class JpaEntityProcessorService {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode schema = mapper.readTree(schemaFile);
 
-        new JpaEntityGenerator(freemarker).generateEntity(schema, entityPackage, className, entityOutputDir);
+        new JpaEntityGenerator(freemarker, occurrences).generateEntity(schema, entityPackage, className, entityOutputDir);
         new JpaRepositoryGenerator(freemarker).generateRepository(repositoryPackage, className, repositoryOutputDir);
     }
 

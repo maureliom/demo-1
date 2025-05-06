@@ -63,7 +63,7 @@ public class SchemaProcessorService {
     }
 
     private void processSchema(File schemaFile) throws Exception {
-        log.info("Validating schema: {}", schemaFile.getName());
+        //log.info("Validating schema: {}", schemaFile.getName());
         SchemaParser parser = new SchemaParser();
         parser.validateSchema(schemaFile);
 
@@ -113,7 +113,7 @@ public class SchemaProcessorService {
                 String defClassName = typeMap.getOrDefault(refName, toUpperCamelCase(refName.replace("Type", "")));
                 File defFile = new File(outputDir, defClassName + ".java");
                 new PojoGenerator(freemarker).generatePojo(fullPackage, defClassName, "Generated from definition", defFields, defFile, typeNode);
-                log.info("Generated definition POJO: {}", defFile.getName());
+                //log.info("Generated definition POJO: {}", defFile.getName());
             }
         }
     }
