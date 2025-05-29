@@ -1,0 +1,51 @@
+1.java 21
+2.I believe it will have to be custom, because libraries can´t interpret it accordingly, even jsonschema2pojo, it doesn´t help with OCPP schema pattern.
+3.just jackson and lombok annotation initially, than later on we advance further jpa annotation.
+4.all schema json files under the same folder, each json schema file will be considered as the root schema, and each root schema will become a subpackage containing the classes that structure the root class, including enum files.
+5.the subpackages will be saved under com.example.demo.model.occp.schema.
+6.explained in item 5.
+7.inconsistencies will need to be informed through logs, the execution can´t have inconsistencies, 100% of the schema structure needs to be interpreted accordingly, it can´t allow inconsistencies.
+8. field names must be canonical to the schema
+9. for java yes internally the names can be lowerCamelCase
+10. additionalProperties initially will not implement maps, it will be just boolean, late on we rediscuss the maps in it.
+11. Yes, required fields identified in the schema must be annotated accordingly.
+12.each json property, or $ref that leads to a property it may or may not have complementary parameters, for instance, integer type properties may have minimum and maximum parameters, String type properties may have maxLength and minLength or just maxLength, String type properties also may be enum, object arrays may have min parameter, each property may have the additionalProperty flag which is a boolean, we need to generator to identify each attribute in the schema and when it don´t get possible to resolve it, the execution needs to stop and inform, it can´t have inconsistencies in the generation.
+13.I need a java class that is capable to interpret a json schema and generate pojos based on the json structure.
+14.This is a batch process, it´s 181 json schema from ocpp.
+15.the root class name must be canonical to json Schema file name or it also can be obtained in the $id attribute inside the schema, like  "$id": "urn:OCPP:Cp:2:2025:1:AuthorizeRequest", it is located after urn:OCPP:Cp:2:2025:1:
+16.and this is important, because I don´t know all the parameters or attributes, in the schema,  so each attribute or parameter in the json that isn´t covered for implementation, the execution needs to stop execution and inform what attribute or parameter is still unknown.
+17.the output can be stored at src/main/java/com/example/demo/model/ocpp/schema/[subpackages]
+18.I will execute it as junit test inside a maven project, all the json schemas I already added to this maven project.
+19.subpackages in snake_case
+20.description paramater, it contains double quotes, so we need to sanitize description parameter do clean \n and \r and also escape characters that affects compilation;
+21.enums containing dots . and dash - , OCPP generated some enums using dots or dashes and it needs to be adjusted to doesn´t affect compilation;
+22.If any enum value starts with a digit (example "1Phase"), Java requires enum constants to not start with digits, Prefix with an underscore (_1PHASE);
+23.original enum string to be kept inside the enum as a field;
+24.these pojos won´t have JPA annotation, they will serve as DTOs and marshaling json string;
+25.after we test the pojo generation and get cleared from inconsistencies, the next step will be to work the JPA pojo for them, and for the JPA pojo we will have to explore how to work OneToOne and ManyToMany for the parameters set as requested;
+26.will have to import the enum classes in the JPA pojos that have enum attributes;
+27.will just step into it after we have tested the json pojo generation and confirm that it is generating the pojos canonically to the schemas, only after that we will spend time discussing the JPA generator; 
+28.Validation for Unrecognized Fields: Ensuring that if the schema has any property that isn't explicitly handled by the generator (for instance, new fields introduced in a future schema version), the system should raise an error and log the unknown property clearly. This will ensure that no schema inconsistencies are missed;
+29.Unit Testing: Setting up unit tests to validate that the generated POJOs adhere to the expected structure;
+30.Logging: Enhancing logging for better visibility during schema parsing and POJO generation. This will be particularly useful for debugging any edge cases or schema inconsistencies;
+31.Handling additionalProperties flag: Initially, we are treating additionalProperties as a boolean flag, but if we need to revisit this for future versions or add map support, we can prepare a placeholder for it;
+32.will trigger the test runner using @Test annotation ;
+33.any unexpected parameter or attribute in the schema must not pass silently it needs to break the execution, I know I'm repeating it but just  to make sure the warnings won't override parameters to be bypassed silently;
+34.prepare a "dry-run mode" that would just "validate" the schemas without generating the files, Could be useful sometimes to just check integrity fast without overwriting classes;
+35.can't have flaws in a communication that will be used widely in Europe by consumers using charging stations and electric components, It needs to follow the schema exactly as it is;
+36.identifying mistakes in schema structures;
+37.implement whitelist of schema attributes, let´s say that the generator is prepare to handle the type parameter and we know that type attribute is used to define an object...it can declare it as string, integer, and object itself where the javatype points to the object, definition lists the $ref type, strings can be enum, strings itself followed by maxLength and more parameters related to it, arrays may have min schema parameter, integers may have maximum and minimum schema parameters, ...and so on so forth..., my doubt is other than what you just anticipaded for unexpected scheme structure, but also for when the generator faces an unrecognized schema parameter that don´t know how to process it into the pojo...because we will process 181 schemas, and the probability to face some unknown or unrecognized schema attribute or parameter may be real;
+38.more attributes like pattern, exclusiveMinimum and oneOf, how do you see them annotaded as jakarta validation annotation;
+39.add jakarta validation, build this Jakarta Validation support already Generate @Pattern, @Min, @Max, @Size, etc, according to the schema;
+40.Still keep POJOs pure DTOs without JPA annotations;
+41.When , for each schema property: If it has maxLength / minLength → generate: @Size(max = X, min = Y);
+42.If it has maximum / minimum → generate: @Max(X) @Min(Y);
+43.If it has pattern → generate: @Pattern(regexp = "...");
+44.If it has exclusiveMinimum or exclusiveMaximum: Jakarta does not have a direct equivalent. comment in the field so we know that extra logic may be needed later. Example:// TODO: exclusiveMinimum constraint not enforced by @Min;
+45.For now, oneOf/anyOf/allOf will trigger clear exception with context, because OCPP 2.0.1 / 2.1 don't use them;
+
+46 configure application.properties
+pojo.generator.treat-warnings-as-errors=true
+pojo.generator.generate-validation-annotations=true
+pojo.generator.dry-run-mode=false
+pojo.generator.schema-directory=/path/to/ocpp-schemas
